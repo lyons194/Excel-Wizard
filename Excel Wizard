@@ -1,0 +1,484 @@
+#Import modules section.
+
+from tkinter import *
+import os
+import openpyxl
+from openpyxl import Workbook
+from openpyxl import load_workbook
+from openpyxl.utils import FORMULAE
+from openpyxl.styles import colors
+from openpyxl.styles import Font, Color
+import time
+from datetime import date
+#from excel_wizard_functions import *
+
+#Core functions variables.
+
+workbook_memory = {}
+notepad_memory = {}
+save_memory = {}
+xlsx_upload = None
+sheet = None
+
+#Menu functions.
+
+"""
+
+20.0304:  Attempting to define the functions outside of the format_xlsx_file command.
+
+
+def create_sheet(a):
+    create_sheet_a = a.split(" ! ")
+    xlsx_upload.create_sheet(f"{create_sheet_a[1]}")
+
+"""
+
+def format_xlsx_file():
+    xlsx_upload = load_workbook(filename=f"{workbook_memory['workbook']}")
+    sheet = xlsx_upload.active
+    #notepad="copy.txt"
+    with open(f"{notepad_memory['notepad']}", "r") as reader:
+        copy_list = []
+        copy_data = None
+        cell_directory = {1:"A", 2:"B", 3:"C", 4:"D", 5:"E",6:"F",7:"G",8:"H",9:"I",10:"J",11:"K",12:"L",13:"M",14:"N",15:"O",16:"P",17:"Q",18:"R",19:"S",20:"T",21:"U",22:"V",23:"W",24:"X",25:"Y",26:"Z"}
+        font_style = Font(name="Calibri", size=11, color=colors.BLACK)
+        print("\n\nIMPORTING COMMAND CRITERIA...\n\n")
+        #Begin create report section.
+        report_create = open(f'{workbook_memory["workbook"]}_report_{date.today()}_{time.time()}.txt','w')
+        report_create.write(f'Report for {workbook_memory["workbook"]}\n{date.today()}\n{time.time()}\n\n')
+        for line in reader.readlines():
+            report_create.write(f"\n{notepad_memory['notepad']}:  New Command --> {line}\n")
+            print(f"\n{notepad_memory['notepad']}:  New Command --> {line}\n", end="")
+        #End create report section.
+            #Group column compare
+            if line.count("group column compare") == 1:
+                group_n = 1
+                group_n_2 = 1
+                temp_dict_1 = {}
+                temp_dict_2 = {}
+                temp_list_1 = []
+                temp_list_2 = []
+                temp_dict_index_1 = 0
+                temp_dict_index_2 = 1
+                group_compare_a = line.split(" ! ")
+                group_compare_b = group_compare_a[1]
+                group_compare_c = group_compare_b.split(";")
+                for value in sheet.iter_rows(min_row=int(group_compare_c[0]),max_row=int(group_compare_c[1]),min_col=int(group_compare_c[2]),max_col=int(group_compare_c[3]),values_only=True):
+                    temp_list_1.append(value[0])
+                    temp_list_2.append(value[1])
+                for item in enumerate(temp_list_2):
+                    try:
+                        print(f"{item}  -->  {temp_list_1[temp_dict_index_2]}")
+                        if item[1] == temp_list_1[temp_dict_index_2]:
+                            print("\n\n\nMatch!\n\n\n")
+                            sheet[f"J{item[0]+1}"] = ""
+                            sheet[f"J{item[0]+2}"] = ""
+                        else:
+                            print("\n\n\nNo Match.\n\n\n")
+                        temp_dict_index_2 += 1
+                    except:
+                        print(f"An error occurred:  Exception item = {item}.")
+                print("\n\n\n\n\n\n\n")
+
+            #Reconcile
+            elif line.count("reconcile") == 1:
+                reconcile_temp_list = []
+                prep_list = []
+                final_list = []
+                reconcile_a = line.split(" ! ")
+                reconcile_b = reconcile_a[1]
+                reconcile_c = reconcile_b.split(";")
+                for value in sheet.iter_rows(min_row=int(reconcile_c[0]),max_row=int(reconcile_c[1]),min_col=int(reconcile_c[2]),max_col=int(reconcile_c[3]), values_only=True):
+                    reconcile_temp_list.append(value)
+                for item in (reconcile_temp_list):
+                    convert_1 = str(item)
+                    convert_2 = convert_1.replace("(", "")
+                    convert_3 = convert_2.replace(")", "")
+                    convert_4 = convert_3.replace(",", "")
+                    convert_5 = float(convert_4)
+                    prep_list.append(convert_5)
+                prep_list.sort(reverse=True)
+                for item in prep_list:
+                    #try:
+                    if item and -item in prep_list:
+                        report_create.write(f"{item}\n")
+            """
+            #create sheet
+            if line.count("create sheet") == 1:
+                line_split = line.split(" ! ")
+                auto_create_tab = xlsx_upload.create_sheet(f"{line_split[1]}")
+            #change sheet
+            elif line.count("change sheet") == 1:
+                change_sheet_a = line.split(" ! ")
+                change_sheet_b = change_sheet_a[1]
+                for item in xlsx_upload.sheetnames:
+                    try:
+                        if item == change_sheet_b:
+                            sheet = xlsx_upload[f"{item}"]
+                    except:
+                        print("\nError:  Sheet name not found.")
+            """
+                
+            """
+            20.0203:  Delete sheet section.  Needs to be completed.
+
+
+            elif line.count("delete sheet") == 1:
+                print(xlsx_upload.sheetnames)
+                delete_sheet_a = line.split(" ! ")
+                delete_sheet_b = delete_sheet_a[1]
+                for item in xlsx_upload.sheetnames:
+                    if item == delete_sheet_b:
+                        xlsx_upload.remove(item)
+            """       
+                
+            #find title
+            """
+            elif line.count("find title") == 1:
+                ft_list = []
+                title_split = line.split(" ! ")
+                title_select = title_split[1]
+                
+                for value in sheet.iter_rows(min_row=1, max_row=1, values_only=True):
+                    ft_list.append(value)
+                    
+                    for item in ft_list[0]:
+                        if item == title_select:
+                            title_message = f'\n\nFOUND TITLE ITEM:  {item}  \n\nItem Cell = [insert cell value]'
+                            sheet["C8"] = title_message
+            """
+            """
+            #Comment            
+            elif line.count("#") == 1:
+                pass
+            #Write cells
+            elif line.count("write cells") == 1:
+                write_cells_a = str(line)
+                write_cells_b = write_cells_a.split(" ! ")
+                write_cells_c = write_cells_b[1]
+                write_cells_d = str(write_cells_c)
+                write_cells_e = write_cells_d.split(" + ")
+                
+                for item in write_cells_e:
+                    wc_data = item.split(";")
+                    sheet[f"{wc_data[0]}"] = f"{wc_data[1]}"
+                    sheet[f"{wc_data[0]}"].font = font_style
+                
+            #Insert columns
+                    
+            elif line.count("insert columns") == 1:
+                insert_columns_a = str(line)
+                insert_columns_b = insert_columns_a.split(" ! ")
+                insert_columns_c = insert_columns_b[1]
+                insert_columns_d = insert_columns_c.split(";")
+                sheet.insert_cols(idx=int(insert_columns_d[0]),amount=int(insert_columns_d[1]))
+                
+            #Insert rows
+                
+            elif line.count("insert rows") == 1:
+                insert_rows_a = str(line)
+                insert_rows_b = insert_rows_a.split(" ! ")
+                insert_rows_c = insert_rows_b[1]
+                insert_rows_d = insert_rows_c.split(";")
+                sheet.insert_rows(idx=int(insert_rows_d[0]),amount=int(insert_rows_d[1]))
+                
+            #Delete columns
+                
+            elif line.count("delete columns") == 1:
+                delete_columns_a = str(line)
+                delete_columns_b = delete_columns_a.split(" ! ")
+                delete_columns_c = delete_columns_b[1]
+                delete_columns_d = delete_columns_c.split(";")
+                print(f"{delete_columns_d}")
+                sheet.delete_cols(idx=int(delete_columns_d[0]),amount=int(delete_columns_d[1]))
+                
+            #Delete rows
+                
+            elif line.count("delete rows") == 1:
+                delete_rows_a = str(line)
+                delete_rows_b = delete_rows_a.split(" ! ")
+                delete_rows_c = delete_rows_b[1]
+                delete_rows_d = delete_rows_c.split(";")
+                print(f"{delete_rows_d}")
+                sheet.delete_rows(idx=int(delete_rows_d[0]),amount=int(delete_rows_d[1]))
+                
+            #Freeze panes
+                
+            elif line.count("freeze panes") == 1:
+                freeze_panes_a = line.split(" ! ")
+                sheet.freeze_panes = freeze_panes_a[1]
+                
+            #Add filter
+                
+            elif line.count("add filter") == 1:
+                add_filter_a = sheet.dimensions
+                sheet.auto_filter.ref = f"{add_filter_a}"
+                
+            #Copy values
+                
+            elif line.count("copy paste values") == 1:
+                copy_values_count = 1
+                copy_values_a = line.split(" ! ")
+                copy_values_b = copy_values_a[1]
+                copy_values_c = copy_values_b.split(";")
+                copy_values_d = []
+                
+                for value in sheet.iter_rows(min_row=int(copy_values_c[0]),max_row=int(copy_values_c[1]),min_col=int(copy_values_c[2]),max_col=int(copy_values_c[3]),values_only=True):
+                    copy_values_d.append(value)
+                    
+                    for item in value:
+                        copy_list.append(item)
+                        
+                for item in copy_list:
+                    if item == None:
+                        sheet[f"{cell_directory[int(copy_values_c[4])]}{copy_values_count}"] = ""
+                        sheet[f"{cell_directory[int(copy_values_c[4])]}{copy_values_count}"].font = font_style
+                        copy_values_count += 1
+                    else:
+                        sheet[f"{cell_directory[int(copy_values_c[4])]}{copy_values_count}"] = f"{item}"
+                        sheet[f"{cell_directory[int(copy_values_c[4])]}{copy_values_count}"].font = font_style
+                        copy_values_count += 1
+                        
+                for i in enumerate(copy_values_d):
+                    print(f"     Row {i[0]+1} Copied | Data  =  {i[1]}")
+                
+            #Copy sheet
+            elif line.count("copy sheet") == 1:
+                pass
+                
+            #Search values
+            elif line.count("search column values") == 1:
+                #
+                pass
+                
+            #
+            elif line.count("search row values") == 1:
+                search_rows_a = line.split(" ! ")
+                search_rows_b = search_rows_a[1]
+                search_rows_c = search_rows_b.split(";")
+                for value in sheet.iter_rows(min_row=int(search_rows_c[1]),max_row=int(search_rows_c[2]),min_col=int(search_rows_c[3]), max_col=int(search_rows_c[4]), values_only=True):
+                    for item in value:
+                        if item == str(search_rows_c[0]):
+                            print(f"\n     RESULT:  MATCH FOUND!  -->  {item}  |  From Row: {value}")
+            """
+            """
+            #Group column compare
+            elif line.count("group column compare") == 1:
+                group_n = 1
+                group_n_2 = 1
+                temp_dict_1 = {}
+                temp_dict_2 = {}
+                temp_list_1 = []
+                temp_list_2 = []
+                temp_dict_index_1 = 0
+                temp_dict_index_2 = 1
+                group_compare_a = line.split(" ! ")
+                group_compare_b = group_compare_a[1]
+                group_compare_c = group_compare_b.split(";")
+                for value in sheet.iter_rows(min_row=int(group_compare_c[0]),max_row=int(group_compare_c[1]),min_col=int(group_compare_c[2]),max_col=int(group_compare_c[3]),values_only=True):
+                    temp_list_1.append(value[0])
+                    temp_list_2.append(value[1])
+                for item in enumerate(temp_list_2):
+                    try:
+                        print(f"{item}  -->  {temp_list_1[temp_dict_index_2]}")
+                        if item[1] == temp_list_1[temp_dict_index_2]:
+                            print("\n\n\nMatch!\n\n\n")
+                            sheet[f"J{item[0]+1}"] = ""
+                            sheet[f"J{item[0]+2}"] = ""
+                        else:
+                            print("\n\n\nNo Match.\n\n\n")
+                        temp_dict_index_2 += 1
+                    except:
+                        print(f"An error occurred:  Exception item = {item}.")
+                print("\n\n\n\n\n\n\n")
+
+            #Reconcile
+            elif line.count("reconcile") == 1:
+                reconcile_temp_list = []
+                prep_list = []
+                final_list = []
+                reconcile_a = line.split(" ! ")
+                reconcile_b = reconcile_a[1]
+                reconcile_c = reconcile_b.split(";")
+                for value in sheet.iter_rows(min_row=int(reconcile_c[0]),max_row=int(reconcile_c[1]),min_col=int(reconcile_c[2]),max_col=int(reconcile_c[3]), values_only=True):
+                    reconcile_temp_list.append(value)
+                for item in (reconcile_temp_list):
+                    convert_1 = str(item)
+                    convert_2 = convert_1.replace("(", "")
+                    convert_3 = convert_2.replace(")", "")
+                    convert_4 = convert_3.replace(",", "")
+                    convert_5 = float(convert_4)
+                    prep_list.append(convert_5)
+                prep_list.sort(reverse=True)
+                for item in prep_list:
+                    #try:
+                    if item and -item in prep_list:
+                        report_create.write(f"{item}\n")
+            """
+            """
+            #Search 
+            elif line.count("search col until"):
+                search_col_a = line.split(" ! ")
+
+            elif line.count("search row until") == 1:
+                pass
+
+            elif line.count("cell directory") == 1:
+                for key in cell_directory.keys():
+                    print(key, '->', cell_directory[key])
+            """
+
+    #Auto-save.
+        #for item in copy_list:
+            #report_create.write(f"{item}\n")
+        xlsx_upload.save(filename=f'{save_memory["saved_doc"]}_saved.xlsx')
+        report_create.close()
+
+
+
+root = Tk()
+
+
+
+#Menu section.
+menu = Menu(root)
+root.config(menu=menu)
+
+file_menu = Menu(menu)
+file_menu.add_command(label="Format .xlsx file", command=format_xlsx_file)
+#file_menu.add_command(label="Export .txt to .xlsx file")
+file_menu.add_command(label="Exit", command=exit_program)
+menu.add_cascade(label="File", menu=file_menu)
+
+create_menu = Menu(menu)
+create_menu.add_command(label="New .xlsx file", command=new_xlsx_file)
+create_menu.add_command(label="New .txt file")
+menu.add_cascade(label="Create", menu=create_menu)
+
+
+
+
+#Set directory.
+set_directory_entry = Entry(root)
+set_directory_entry.place(x=25,y=25)
+set_directory_entry.insert(0,"Sample: C:\\\\Users\\\\[username]")
+
+show_directory_entry = Entry(root)
+show_directory_entry.place(x=200,y=25)
+
+label_directory_entry = Label(root,text="Directory Status:",fg="Blue")
+label_directory_entry.place(x=200,y=50)
+
+
+
+def callback1():
+    callback_a = set_directory_entry.get()
+    try:
+        os.chdir(str(callback_a))
+        print(os.getcwd())
+        show_directory_entry.insert(0,"Success: path verified")
+        label_directory_entry = Label(root,text="Directory Status:",fg="Green")
+        label_directory_entry.place(x=200,y=50)
+    except:
+        print("Error: path not found.")
+        show_directory_entry.insert(0,"Error: path not found")
+        label_directory_entry = Label(root,text="Directory Status:",fg="Red")
+        label_directory_entry.place(x=200,y=50)
+
+    
+set_directory_button = Button(root, text="Set Directory", width=15, command=callback1).place(x=25,y=50)
+
+
+
+
+#Set .xlsx file.
+set_xlsx_entry = Entry(root)
+set_xlsx_entry.place(x=25,y=100)
+set_xlsx_entry.insert(0,'Sample: "file.xlsx"')
+
+show_xlsx_entry = Entry(root)
+show_xlsx_entry.place(x=200,y=100)
+
+label_xlsx_entry = Label(root,text="File Load Status:",fg="Blue")
+label_xlsx_entry.place(x=200,y=125)
+
+
+def callback2():
+    workbook_memory["workbook"] = set_xlsx_entry.get()
+    try:
+        xlsx_upload = load_workbook(filename=f"{workbook_memory['workbook']}")
+        show_xlsx_entry.insert(0,"Success: file loaded")
+        label_xlsx_entry = Label(root,text="File Load Status:",fg="Green")
+        label_xlsx_entry.place(x=200,y=125)
+    except:
+        show_xlsx_entry.insert(0,"Error: file not found")
+        label_xlsx_entry = Label(root,text="File Load Status:",fg="Red")
+        label_xlsx_entry.place(x=200,y=125)
+
+
+set_xlsx_button = Button(root, text="Set .xlsx File", width=15, command=callback2).place(x=25,y=125)
+
+
+set_txt_entry = Entry(root)
+set_txt_entry.place(x=25,y=175)
+set_txt_entry.insert(0,'Sample: "file.txt"')
+
+show_txt_entry = Entry(root)
+show_txt_entry.place(x=200,y=175)
+
+label_txt_entry = Label(root,text="File Load Status:",fg="Blue")
+label_txt_entry.place(x=200,y=200)
+
+
+def callback3():
+    notepad_memory["notepad"] = set_txt_entry.get()
+    try:
+        with open(f"{notepad_memory['notepad']}", "r") as reader:
+            pass
+        show_txt_entry.insert(0,"Success: file loaded")
+        label_txt_entry = Label(root,text="File Load Status:",fg="Green")
+        label_txt_entry.place(x=200,y=200)
+    except:
+        show_txt_entry.insert(0,"Error: file not found")
+        label_txt_entry = Label(root,text="File Load Status:",fg="Red")
+        label_txt_entry.place(x=200,y=200)
+
+
+set_txt_button = Button(root, text="Set .txt File", width=15, command=callback3).place(x=25,y=200)
+
+
+
+set_save_name_entry = Entry(root)
+set_save_name_entry.place(x=25,y=250)
+set_save_name_entry.insert(0,'Save .XLSX file as: ')
+
+show_save_entry = Entry(root)
+show_save_entry.place(x=200,y=250)
+
+label_save_entry = Label(root,text="Save File As:",fg="Blue")
+label_save_entry.place(x=200,y=275)
+
+
+def callback4():
+        save_memory["saved_doc"] = set_save_name_entry.get()
+        try:
+                show_save_entry.insert(0,f'{save_memory["saved_doc"]}')
+                label_save_entry = Label(root,text="Save File As:",fg="Green")
+                label_save_entry.place(x=200,y=275)
+        except:
+                pass
+        #show_txt_entry.insert(0,"Error: file not found")
+        #label_txt_entry = Label(root,text="File Load Status:",fg="Red")
+        #label_txt_entry.place(x=200,y=225)
+
+
+set_saved_button = Button(root, text="Save .XLSX as:", width=15, command=callback4).place(x=25,y=275)
+
+
+root.wm_title("Excel Wizard")
+
+root.geometry("350x400")
+
+root.resizable(False,False)
+
+root.mainloop()
