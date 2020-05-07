@@ -7,12 +7,6 @@
 
 """
 
-"""
-
-Import modules section
-
-"""
-
 from tkinter import *
 import os
 from openpyxl import Workbook
@@ -67,24 +61,6 @@ def read_cmd(x):
     except:
         print(f"Error detected: {x} -> Please review this command.")
 
-"""
-
-20.0504- Idea for new function: Process
-
-This function contains several other functions within it.
-
-1 - read_cmd(x)
-    -> So the program can analyze the commands written on each line of the .txt file.
-
-2 - [functionality for the specified command]
-    -> The code for the task(s) of the specified command.
-
-3 - cmd_memory.clear()
-    -> To ensure that the cmd_memory list is sterilized after each command.
-
-
-"""
-
 
 """
 
@@ -99,17 +75,6 @@ def create_report():
         report_create.write(f"\n{notepad_memory['notepad']}:  New Command --> {line}\n")
         print(f"\n{notepad_memory['notepad']}:  New Command --> {line}\n", end="")
 
-
-"""
-
-"""
-
-Eventually, put the condensed format_xlsx_file function here.
-
-The format_xlsx_file command will very likely be the last Excel function defined, as it references all other Excel functions.
-
-def format_xlsx_file():
-    pass
 
 """
 
